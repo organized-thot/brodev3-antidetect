@@ -1,80 +1,114 @@
 const config = require('../config');
-const { JWT } = require('google-auth-library');
-const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { RateLimiter } = require("limiter");
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
 
-const auth = new JWT({
-    email: config.googleEmail,
-    key: config.googleKey,
-    scopes: [
-    'https://www.googleapis.com/auth/spreadsheets',
-    ]
+const baserowAPI = axios.create({
+    baseURL: config.baserowURL,
+    headers: {
+        'Authorization': `Token ${config.baserowToken}`,
+        'Content-Type': 'application/json'
+    }
 });
 
-const doc = new GoogleSpreadsheet(config.googleSheetID, auth);
 const limiter = new RateLimiter({ tokensPerInterval: 45, interval: "minute" });
 
 let db = {};
-let sheet;
 
 async function connect(){
-    await doc.loadInfo(); 
-    sheet = doc.sheetsByIndex[0];
-    await sheet.loadHeaderRow(1);
+    // Connection is handled by axios instance
+    return true;
 };
 
 async function check_Profile(name){
     await limiter.removeTokens(4);
-    await connect();
-    let rows = await sheet.getRows();
-    for (let i = 0; i < rows.length; i++){
-        if (rows[i].get('name') == name){
-            return true;
+    try {
+        const response = await baserowAPI.get(`/api/database/rows/table/${config.baserowTableID}/?search=${encodeURIComponent(name)}`);
+        const rows = response.data.results;
+        for (let i = 0; i < rows.length; i++){
+            if (rows[i].name == name){
+                return true;
+            };
         };
-    };
-    return false;
+        return false;
+    } catch (error) {
+        console.error('Error checking profile:', error);
+        return false;
+    }
 };
 
 async function update_Profile(name, data){
     await limiter.removeTokens(5);
-    await connect();
-    let check = await check_Profile(name);
-    if (check == false)
-        await sheet.addRow(data, {insert: true})
-    else {
-        let row = await get_Profile(name);
-        await row.assign(data);
-        await row.save();
-    };  
+    try {
+        let check = await check_Profile(name);
+        if (check == false) {
+            await baserowAPI.post(`/api/database/rows/table/${config.baserowTableID}/`, data);
+        } else {
+            const response = await baserowAPI.get(`/api/database/rows/table/${config.baserowTableID}/?search=${encodeURIComponent(name)}`);
+            const rows = response.data.results;
+            let rowId = null;
+            for (let i = 0; i < rows.length; i++){
+                if (rows[i].name == name) {
+                    rowId = rows[i].id;
+                    break;
+                }
+            }
+            if (rowId) {
+                await baserowAPI.patch(`/api/database/rows/table/${config.baserowTableID}/${rowId}/`, data);
+            }
+        }
+    } catch (error) {
+        console.error('Error updating profile:', error);
+    }
 };
 
 async function get_Profile(name){
     await limiter.removeTokens(4);
-    await connect();
-    let rows = await sheet.getRows();
-    for (let i = 0; i < rows.length; i++){
-        if (rows[i].get('name') == name)
-            return rows[i];
-    };
-    return false;
+    try {
+        const response = await baserowAPI.get(`/api/database/rows/table/${config.baserowTableID}/?search=${encodeURIComponent(name)}`);
+        const rows = response.data.results;
+        for (let i = 0; i < rows.length; i++){
+            if (rows[i].name == name) {
+                return {
+                    id: rows[i].id,
+                    data: rows[i],
+                    get: function(field) { return this.data[field]; },
+                    assign: async function(newData) { 
+                        Object.assign(this.data, newData);
+                    },
+                    save: async function() {
+                        await baserowAPI.patch(`/api/database/rows/table/${config.baserowTableID}/${this.id}/`, this.data);
+                    },
+                    delete: async function() {
+                        await baserowAPI.delete(`/api/database/rows/table/${config.baserowTableID}/${this.id}/`);
+                    }
+                };
+            }
+        }
+        return false;
+    } catch (error) {
+        console.error('Error getting profile:', error);
+        return false;
+    }
 };
 
 let open_Profile = async function(name){
     await limiter.removeTokens(4);
-    await connect();
     let profile = await get_Profile(name);
-    await profile.assign({open: 1});
-    await profile.save();
+    if (profile) {
+        await profile.assign({open: 1});
+        await profile.save();
+    }
 };
 
 let close_Profile = async function(name){
     await limiter.removeTokens(3);
-    await connect();
     let profile = await get_Profile(name);
-    await profile.assign({open: ' '});
-    await profile.save();
+    if (profile) {
+        await profile.assign({open: ' '});
+        await profile.save();
+    }
 };
 
 async function delete_Profile(name){
@@ -86,27 +120,37 @@ async function delete_Profile(name){
 
 let get_Profiles = async function(){
     await limiter.removeTokens(2);
-    await connect();
-    let arr = [];
-    let rows = await sheet.getRows();
-    rows.forEach(async row => {
-        arr.push(await row.get('name'));
-    });
-     return arr;
+    try {
+        const response = await baserowAPI.get(`/api/database/rows/table/${config.baserowTableID}/`);
+        let arr = [];
+        const rows = response.data.results;
+        rows.forEach(row => {
+            arr.push(row.name);
+        });
+        return arr;
+    } catch (error) {
+        console.error('Error getting profiles:', error);
+        return [];
+    }
 };
 
 async function get_Selected(){
     await limiter.removeTokens(3);
-    await connect();
-    let res = [];
-    let rows = await sheet.getRows();
-    for (let i = 0; i < rows.length; i++){
-        if (await rows[i].get('select') == 'X'){
-            let name = await rows[i].get('name');
-            res.push(name);
-        };
-    };
-    return res;
+    try {
+        const response = await baserowAPI.get(`/api/database/rows/table/${config.baserowTableID}/`);
+        let res = [];
+        const rows = response.data.results;
+        for (let i = 0; i < rows.length; i++){
+            if (rows[i].select == 'X'){
+                let name = rows[i].name;
+                res.push(name);
+            }
+        }
+        return res;
+    } catch (error) {
+        console.error('Error getting selected profiles:', error);
+        return [];
+    }
 };
 
 function get_Engines(){
