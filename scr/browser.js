@@ -38,8 +38,8 @@ let proxyChecker = async function (type, proxy, auth){
   if (type == 'socks5'){
     const proxyAgent  = new SocksProxyAgent(`socks5://${username}:${password}@${host}:${port}`);
     const axiosInstance = axios.create({
-      httpsAgent: proxyAgent, 
-      httpAgent: proxyAgent 
+      httpsAgent: proxyAgent,
+      httpAgent: proxyAgent
     });
     try {
       check = await axiosInstance.get('http://ip.bablosoft.com/');
@@ -50,7 +50,7 @@ let proxyChecker = async function (type, proxy, auth){
   };
   if (check)
     return true;
-  else 
+  else
     return false;
 };
 
@@ -59,23 +59,15 @@ let engine = function() {
   let dir = path.resolve(__dirname, '..') + '/engines/' + utils.engine;
   if (utils.engine != 'main')
     plugin.setWorkingFolder(dir);
-  else  
+  else
     plugin.setWorkingFolder('./data');
 };
 
 let launch = async function (name, profile){
   let browser;
   await lock.acquire('key', async () => {
-    let dir;
-    let storageType = await utils.storageType;
-    switch(storageType){
-      case 'Cloud':
-        dir = config.cloudDir + `profiles/${name}`;
-        break;
-      case 'Local':
-        dir = config.storageDir + `profiles/${name}`;
-        break;
-    };
+    let dir = config.storageDir + `profiles/${name}`;
+
     if (!fs.existsSync(dir))
       fs.mkdirSync(dir, { recursive: true });
 
@@ -94,15 +86,15 @@ let launch = async function (name, profile){
         changeBrowserLanguage: true,
       }
     };
-    
+
     if (await profile.get('fingerprint') > false){
       let fp = JSON.stringify(JSON.parse(fs.readFileSync(dir + '/fp.json')));
-      plugin.useFingerprint(fp, {    
+      plugin.useFingerprint(fp, {
         // safeElementSize: true,
         emulateSensorAPI: false,
       });
     }
-    else 
+    else
       options.profile.loadFingerprint = false;
 
     let proxyType = await profile.get('proxyType');
@@ -116,16 +108,16 @@ let launch = async function (name, profile){
         console.log(utils.timeLog() + ' Bad proxy at ' + name);
         browser =  false;
         return false;
-      } 
+      }
 
-      plugin.useProxy(`${proxyType}://${login}:${proxy.join(":")}`, 
+      plugin.useProxy(`${proxyType}://${login}:${proxy.join(":")}`,
         options.proxy);
     }
-    else 
+    else
       options.profile.loadProxy = false;
 
     plugin.useProfile(dir, options.profile);
-  
+
     browser = await plugin.launchPersistentContext(dir, {
       headless: false,
       ignoreDefaultArgs: ["--enable-automation", `--allow-file-access-from-files`],
@@ -133,7 +125,7 @@ let launch = async function (name, profile){
       //   `--disable-extensions-except=E:/farm/antidetect/extentions/phantom`,
       //   `--load-extension=E:/farm/antidetect/extentions/phantom`
       // ]
-      
+
     });
 
     browser.name = name;
@@ -141,19 +133,12 @@ let launch = async function (name, profile){
       let name = data.name;
       console.log(utils.timeLog() + `Profile ${name} closed`);
       delete manage.active[name];
-      switch(storageType){
-        case 'Cloud':
-          setTimeout(db.close_Profile, 5000, name);
-          break;
-        case 'Local':
-          setTimeout(db.close_Profile, 3000, name);
-          break;
-      };
-    });  
+      setTimeout(db.close_Profile, 3000, name);
+    });
   });
   if (browser == false)
     return false;
-  
+
   let page = await browser.newPage();
   try{
     if (name.includes('Grass')){
@@ -186,13 +171,3 @@ let launch = async function (name, profile){
 };
 
 module.exports.launch = launch;
-
-
-
-
-
-
-  
-
-
-
