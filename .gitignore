@@ -1,1 +1,9 @@
 node_modules/
+
+# IDE CONFIG
+.vscode/
+
+# AI CODING TOOLS
+.llm-chat-history
+.agent/
+.ralphy/
