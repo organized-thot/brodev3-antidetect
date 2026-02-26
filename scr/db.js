@@ -5,9 +5,9 @@ const path = require('path');
 const axios = require('axios');
 
 const baserowAPI = axios.create({
-    baseURL: config.baserowURL,
+    baseURL: config.baserowApiUrl,
     headers: {
-        'Authorization': `Token ${config.baserowToken}`,
+        'Authorization': `Token ${config.baserowApiToken}`,
         'Content-Type': 'application/json'
     }
 });
@@ -24,7 +24,7 @@ async function connect(){
 async function check_Profile(name){
     await limiter.removeTokens(4);
     try {
-        const response = await baserowAPI.get(`/api/database/rows/table/${config.baserowTableID}/?search=${encodeURIComponent(name)}`);
+        const response = await baserowAPI.get(`/api/database/rows/table/${config.baserowTableId}/?search=${encodeURIComponent(name)}`);
         const rows = response.data.results;
         for (let i = 0; i < rows.length; i++){
             if (rows[i].name == name){
@@ -43,9 +43,9 @@ async function update_Profile(name, data){
     try {
         let check = await check_Profile(name);
         if (check == false) {
-            await baserowAPI.post(`/api/database/rows/table/${config.baserowTableID}/`, data);
+            await baserowAPI.post(`/api/database/rows/table/${config.baserowTableId}/`, data);
         } else {
-            const response = await baserowAPI.get(`/api/database/rows/table/${config.baserowTableID}/?search=${encodeURIComponent(name)}`);
+            const response = await baserowAPI.get(`/api/database/rows/table/${config.baserowTableId}/?search=${encodeURIComponent(name)}`);
             const rows = response.data.results;
             let rowId = null;
             for (let i = 0; i < rows.length; i++){
@@ -55,7 +55,7 @@ async function update_Profile(name, data){
                 }
             }
             if (rowId) {
-                await baserowAPI.patch(`/api/database/rows/table/${config.baserowTableID}/${rowId}/`, data);
+                await baserowAPI.patch(`/api/database/rows/table/${config.baserowTableId}/${rowId}/`, data);
             }
         }
     } catch (error) {
@@ -66,7 +66,7 @@ async function update_Profile(name, data){
 async function get_Profile(name){
     await limiter.removeTokens(4);
     try {
-        const response = await baserowAPI.get(`/api/database/rows/table/${config.baserowTableID}/?search=${encodeURIComponent(name)}`);
+        const response = await baserowAPI.get(`/api/database/rows/table/${config.baserowTableId}/?search=${encodeURIComponent(name)}`);
         const rows = response.data.results;
         for (let i = 0; i < rows.length; i++){
             if (rows[i].name == name) {
@@ -78,10 +78,10 @@ async function get_Profile(name){
                         Object.assign(this.data, newData);
                     },
                     save: async function() {
-                        await baserowAPI.patch(`/api/database/rows/table/${config.baserowTableID}/${this.id}/`, this.data);
+                        await baserowAPI.patch(`/api/database/rows/table/${config.baserowTableId}/${this.id}/`, this.data);
                     },
                     delete: async function() {
-                        await baserowAPI.delete(`/api/database/rows/table/${config.baserowTableID}/${this.id}/`);
+                        await baserowAPI.delete(`/api/database/rows/table/${config.baserowTableId}/${this.id}/`);
                     }
                 };
             }
@@ -121,7 +121,7 @@ async function delete_Profile(name){
 let get_Profiles = async function(){
     await limiter.removeTokens(2);
     try {
-        const response = await baserowAPI.get(`/api/database/rows/table/${config.baserowTableID}/`);
+        const response = await baserowAPI.get(`/api/database/rows/table/${config.baserowTableId}/`);
         let arr = [];
         const rows = response.data.results;
         rows.forEach(row => {
@@ -137,7 +137,7 @@ let get_Profiles = async function(){
 async function get_Selected(){
     await limiter.removeTokens(3);
     try {
-        const response = await baserowAPI.get(`/api/database/rows/table/${config.baserowTableID}/`);
+        const response = await baserowAPI.get(`/api/database/rows/table/${config.baserowTableId}/`);
         let res = [];
         const rows = response.data.results;
         for (let i = 0; i < rows.length; i++){

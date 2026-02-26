@@ -47,7 +47,7 @@ The application provides a convenient and simple interface accessible through a 
 
 ### Dashboard
 
-The Dashboard is a Google Sheets document containing information about browser profiles. With this table, you can easily manage your profiles, make changes, and track relevant information.
+The Dashboard is a Baserow table containing information about browser profiles. With this table, you can easily manage your profiles, make changes, and track relevant information.
 
 What you can do with the Dashboard:
 
@@ -106,88 +106,39 @@ Certainly, these results are quite subjective, but you can use this data to comp
 The browser supports proxies, you can configure them in both the dashboard and the console application. The following connection protocols are available: HTTPS and SOCKS5, you can connect to proxies using login and password is possible. 
 
 The browser automatically sets the time, language, and geolocation according to your proxy settings, and also prevents IP address leakage through WebRTC.
-### Cloud
-> [!NOTE]
-> In development...
->
-> 
-You have convenient storage options for profile data, both locally and in the cloud. Forget about the limitations of a single device — cloud storage allows you to access your profiles from any device or collaborate within a team. 
-
-For cloud integration, you need a service that provides a virtual disk, displaying the contents of your cloud storage
-
 ## Installation and guides
 
 
-### Step 1: Google spreadsheet
+### Step 1: Baserow
 
-1. Open Google Sheets in your web browser. 
-2. Create a copy of the  ["Dashboard"](https://docs.google.com/spreadsheets/d/1Pjpjtm5p0bPSe_dJjwCMa8l5PUCoHooZRP7IFSV_SwU/edit?usp=sharing) template on your drive by following the template link and selecting "File" -> "Make a copy".
-3. Rename the copied file as desired, for example, "AntiDashboard".
-4. Now you have your own copy of the ["Dashboard"](https://docs.google.com/spreadsheets/d/1Pjpjtm5p0bPSe_dJjwCMa8l5PUCoHooZRP7IFSV_SwU/edit?usp=sharing) template that you can customize and use in your antidetect browser.
+1. Create a [Baserow](https://baserow.io/) account.
+2. Create a new database.
+3. Create a new table with the following **Single line text** fields:
+   - `name`
+   - `select`
+   - `open`
+   - `proxy`
+   - `fingerprint`
+   - `time`
 
-
-### Step 2: Google API
-
-1. Go to the [Google Developers Console](https://console.cloud.google.com/cloud-resource-manager?pli=1)
-2. Select your project or create a new one (and then select it)
-3. Enable the Sheets API for your project
-- In the sidebar on the left, select Enabled APIs & Services
-- Click the blue "Enable APIs and Services" button in the top bar
-- Search for "sheets"
-- Click on ["Google Sheets API"](https://console.cloud.google.com/apis/library/sheets.googleapis.com?project=)
-- Click the blue "Enable" button
-4. (Optional) Enable the "Google Drive API" for your project - if you want to manage document permissions
-- same as above, but search for "drive" and enable the "Google Drive API"
-
-Next, you need to create and connect as a service bot user that belongs to your app.
-Follow steps above to set up project and enable sheets API:
-
-- Create a service account for your project
-- In the sidebar on the left, select [APIs & Services > Credentials](https://console.cloud.google.com/apis/credentials?project=)
-- Click blue "+ CREATE CREDENTIALS" and select ["Service account"](https://console.cloud.google.com/iam-admin/serviceaccounts/create?previousPage=&project=) option
-- Enter name, description, click "CREATE"
-- You can skip permissions, click "CONTINUE" and "DONE"
-- In the ['Credentials'](https://console.cloud.google.com/apis/credentials?project=) menu, under the "Service Accounts" section, select the created account and click on it
-- In the top menu, select the "Keys" section
-- Click on the 'Add key' button and choose "Create new key"
-- Select the type as "JSON" and click on "Create"
-
-A JSON file containing the login credentials will be downloaded, which we will need for further use.
-
-
-### Step 3: Google Drive
-
-1. Download and install [Google Drive](https://workspace.google.com/products/drive/#download) for desktop
-2. Add the "My Drive" folder
-- Open Google Drive, sign in with your account, and locate the "My Drive" folder in the main interface
-3. Set up folder sync settings for "My Drive"
-- In Google Drive settings, navigate to Preferences > My Drive
-- Choose Sync all files and folders or Sync specific folders to specify files for syncing to your computer
-5. Enable offline access for the folder
-- Right-click on the "My Drive" folder and select Available offline to ensure access when you’re not connected to the internet
-6. Create a folder named "antidetect" in "My Drive"
-
-
-### Step 4: Environment Configuration Guide
+### Step 2: Environment Configuration Guide
 
 To configure the `.env` file, follow these steps:
 1. **Rename** `.env_example` to `.env`
 2. **Set the following variables** in the `.env` file:
 
     ```plaintext
-    DIR = ""
-    GOOGLEEMAIL = ""
-    GOOGLESHEETID = ""
+    BASEROW_API_URL = "https://api.baserow.io"
+    BASEROW_API_TOKEN = "YOUR_BASEROW_TOKEN"
+    BASEROW_TABLE_ID = "YOUR_TABLE_ID"
     FPKEY = ""
-    GOOGLEKEY = ""
     NODE_ENV = "test"
     ```
 
-- **DIR**: The path to the `antidetect` directory on Google Drive.
-- **GOOGLEEMAIL**: The `client_email` field from the JSON file of your Google Service Account.
-- **GOOGLESHEETID**: The ID of the Google Sheet. You can find this in the URL on the dashboard page, located between `docs.google.com/spreadsheets/d/` and `/edit?`.
+- **BASEROW_API_URL**: The URL of your Baserow instance (e.g., `https://api.baserow.io`).
+- **BASEROW_API_TOKEN**: Your Baserow database token.
+- **BASEROW_TABLE_ID**: The ID of the Baserow table you created.
 - **FPKEY**: The fingerprinting key provided by [Bablosoft](https://fingerprints.bablosoft.com/).
-- **GOOGLEKEY**: The `private_key` field from the JSON file of your Google Service Account.
 - **NODE_ENV**: The environment setting. Don't change
 
 > ⚠️ **Note**: Ensure that all sensitive keys and paths are accurately set to prevent configuration issues.

@@ -66,16 +66,7 @@ let engine = function() {
 let launch = async function (name, profile){
   let browser;
   await lock.acquire('key', async () => {
-    let dir;
-    let storageType = await utils.storageType;
-    switch(storageType){
-      case 'Cloud':
-        dir = config.cloudDir + `profiles/${name}`;
-        break;
-      case 'Local':
-        dir = config.storageDir + `profiles/${name}`;
-        break;
-    };
+    let dir = config.storageDir + `profiles/${name}`;
     if (!fs.existsSync(dir))
       fs.mkdirSync(dir, { recursive: true });
 
@@ -141,14 +132,7 @@ let launch = async function (name, profile){
       let name = data.name;
       console.log(utils.timeLog() + `Profile ${name} closed`);
       delete manage.active[name];
-      switch(storageType){
-        case 'Cloud':
-          setTimeout(db.close_Profile, 5000, name);
-          break;
-        case 'Local':
-          setTimeout(db.close_Profile, 3000, name);
-          break;
-      };
+      setTimeout(db.close_Profile, 3000, name);
     });  
   });
   if (browser == false)

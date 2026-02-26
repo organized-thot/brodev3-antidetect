@@ -2,7 +2,7 @@ const figlet = require('figlet');
 const db = require('./scr/db');
 
 
-let storageType;
+let storageType = 'Local';
 let engine = 'main';
 
 function printLogo(){
