@@ -47,7 +47,7 @@ The application provides a convenient and simple interface accessible through a 
 
 ### Dashboard
 
-The Dashboard is a Baserow table containing information about browser profiles. With this table, you can easily manage your profiles, make changes, and track relevant information.
+The Dashboard is a Baserow database containing information about browser profiles. With this table, you can easily manage your profiles, make changes, and track relevant information.
 
 What you can do with the Dashboard:
 
@@ -61,11 +61,7 @@ This table serves as a database for the application. Information from the cells 
 
 The Dashboard makes managing your profiles quick, convenient, and efficient.
 
-<p align="center">
-      <img src="https://i.ibb.co/wYQ9jD5/image-2024-02-21-05-23-39.png" >
-</p>
-
-The Dashboard can be customized to suit your needs, with additional columns added to track more information. In the example below, four additional parameters are included: Gmail, Twitter, Telegram, and Discord. These indicate the presence of an active session in the profile on each platform. You can easily track the status of your profiles across different platforms directly from the Dashboard.
+The Dashboard can be customized to suit your needs, with additional columns added to track more information. You can easily track the status of your profiles across different platforms directly from the Dashboard.
 
 
 ### Fingerprint
@@ -113,8 +109,6 @@ The browser automatically sets the time, language, and geolocation according to 
 > 
 You have convenient storage options for profile data, both locally and in the cloud. Forget about the limitations of a single device — cloud storage allows you to access your profiles from any device or collaborate within a team. 
 
-For cloud integration, you need a service that provides a virtual disk, displaying the contents of your cloud storage
-
 ## Installation and guides
 
 
@@ -161,20 +155,20 @@ To configure the `.env` file, follow these steps:
 2. **Set the following variables** in the `.env` file:
 
     ```plaintext
+    BASEROW_API_URL="https://api.baserow.io"
+    BASEROW_API_TOKEN="your_token_here"
+    BASEROW_TABLE_ID="your_table_id_here"
     DIR = ""
-    BASEROW_API_URL = "https://api.baserow.io"
-    BASEROW_API_TOKEN = ""
-    BASEROW_TABLE_ID = ""
     FPKEY = ""
     NODE_ENV = "test"
     ```
 
-- **DIR**: The local path to your synced storage folder (e.g., `C:\Users\YourName\Google Drive\antidetect`).
-- **BASEROW_API_URL**: The API URL of your Baserow instance (default is `https://api.baserow.io`).
-- **BASEROW_API_TOKEN**: The Database Token you created in Step 2.
-- **BASEROW_TABLE_ID**: The ID of your Baserow table from Step 2.
+- **BASEROW_API_URL**: The URL of your Baserow instance (e.g., https://api.baserow.io).
+- **BASEROW_API_TOKEN**: Your Baserow Database Token.
+- **BASEROW_TABLE_ID**: The ID of the table you created.
+- **DIR**: The path to the `antidetect` directory (optional).
 - **FPKEY**: The fingerprinting key provided by [Bablosoft](https://fingerprints.bablosoft.com/).
-- **NODE_ENV**: The environment setting. Don't change.
+- **NODE_ENV**: The environment setting. Don't change
 
 > ⚠️ **Note**: Ensure that all keys and paths are accurately set to prevent configuration issues.
 
