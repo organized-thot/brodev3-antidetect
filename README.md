@@ -102,12 +102,6 @@ Certainly, these results are quite subjective, but you can use this data to comp
 The browser supports proxies, you can configure them in both the dashboard and the console application. The following connection protocols are available: HTTPS and SOCKS5, you can connect to proxies using login and password is possible. 
 
 The browser automatically sets the time, language, and geolocation according to your proxy settings, and also prevents IP address leakage through WebRTC.
-### Cloud
-> [!NOTE]
-> In development...
->
-> 
-You have convenient storage options for profile data, both locally and in the cloud. Forget about the limitations of a single device — cloud storage allows you to access your profiles from any device or collaborate within a team. 
 
 ## Installation and guides
 
@@ -139,16 +133,7 @@ You have convenient storage options for profile data, both locally and in the cl
     - The number after `/table/` is your Table ID (e.g., `54321`).
 
 
-### Step 3: Cloud Storage
-
-To use the cloud storage feature for your profiles, you need to set up a folder that is synced across your devices.
-
-1. Install a cloud sync client (e.g., [Google Drive for Desktop](https://workspace.google.com/products/drive/#download), Dropbox, OneDrive).
-2. Create a folder (e.g., named "antidetect") in your synced directory.
-3. You will need the path to this folder for the configuration.
-
-
-### Step 4: Environment Configuration
+### Step 3: Environment Configuration
 
 To configure the `.env` file, follow these steps:
 1. **Rename** `.env_example` to `.env`
