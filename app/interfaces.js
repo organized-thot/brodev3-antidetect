@@ -15,12 +15,12 @@ let start = async function(){
       message: 'Select a section:',
       prefix: utils.timeLog(),
       choices: [
-        new inquirer.Separator(), 
+        new inquirer.Separator(),
         'Profiles',
-        'Dashboard',
+        // 'Dashboard',
         'Multiprocessing',
         'About',
-        new inquirer.Separator(), 
+        new inquirer.Separator(),
         'Exit',
       ],
     }
@@ -74,9 +74,9 @@ let dashboard = async function(){
           message: 'Select a menu item:',
           prefix: utils.timeLog(),
           choices: [
-            new inquirer.Separator(), 
-            'Connect', 
-            new inquirer.Separator(), 
+            new inquirer.Separator(),
+            // 'Connect',
+            new inquirer.Separator(),
             'Back'
           ],
         }
@@ -103,10 +103,10 @@ let storage_Type = async function(){
           message: 'Select a type of storage:',
           prefix: utils.timeLog(),
           choices: [
-            new inquirer.Separator(), 
-            'Cloud', 
-            'Local', 
-            new inquirer.Separator(), 
+            new inquirer.Separator(),
+            'Cloud',
+            'Local',
+            new inquirer.Separator(),
             'Back'
           ],
         }
@@ -134,11 +134,11 @@ let profiles_Menu = async function(){
           message: 'Select a menu item:',
           prefix: utils.timeLog(),
           choices: [
-            new inquirer.Separator(), 
-            'New profile', 
-            'List of profiles', 
+            new inquirer.Separator(),
+            'New profile',
+            'List of profiles',
             'Selected in the table',
-            new inquirer.Separator(), 
+            new inquirer.Separator(),
             'Back'
           ],
         }
@@ -148,7 +148,7 @@ let profiles_Menu = async function(){
                 let name = await commands.create_Profile();
                 if (name != false)
                     return profile_Action(name);
-                else    
+                else
                     return profiles_Menu(name);
             case 'List of profiles':
                 return profiles();
@@ -187,12 +187,12 @@ let selected_Actions = async function(){
         name: 'action',
         message: 'Select an action:',
         prefix: utils.timeLog(),
-        choices: [ 
-            new inquirer.Separator(), 
+        choices: [
+            new inquirer.Separator(),
             'Open selected profiles',
             'Delete selected profiles',
-            new inquirer.Separator(), 
-            'Back', 
+            new inquirer.Separator(),
+            'Back',
         ]
     }]).then(async (answers) => {
         switch(answers.action){
@@ -203,7 +203,7 @@ let selected_Actions = async function(){
                 await manage.deleteSelected();
                 break;
             case 'Back':
-                return await profiles_Menu();                
+                return await profiles_Menu();
         };
         return;
     });
@@ -215,7 +215,7 @@ let profile_Action = async function (profile){
     let open = await pdata.get('open');
     if (open == true)
         message = `Profile: ${profile}\nOpen: true\n`
-    else 
+    else
         message = `Profile: ${profile}\nOpen: false\n`
     let proxy = await pdata.get('proxy');
     if (proxy == false || proxy == undefined)
@@ -239,16 +239,16 @@ IP: ${proxy}\n`;
       pageSize: 31,
       message: message + 'Select an action:',
       prefix: utils.timeLog(),
-      choices: [ 
+      choices: [
         new inquirer.Separator(),
-        'Open', 
-        'Proxy', 
+        'Open',
+        'Proxy',
         'Fingerprint',
-        // 'Extensions', 
+        // 'Extensions',
         'Rename',
         'Delete',
-        new inquirer.Separator(), 
-        'Back', 
+        new inquirer.Separator(),
+        'Back',
         'Back to menu'
     ],
     },
@@ -300,12 +300,12 @@ ${utils.timeLog()} Select an action:`;
         name: 'action',
         message: message,
         prefix: utils.timeLog(),
-        choices: [ 
-            new inquirer.Separator(), 
+        choices: [
+            new inquirer.Separator(),
             'Set new proxy',
             'Delete proxy',
-            new inquirer.Separator(), 
-            'Back', 
+            new inquirer.Separator(),
+            'Back',
         ]
     }]).then(async (answers) => {
         switch(answers.action){
@@ -316,7 +316,7 @@ ${utils.timeLog()} Select an action:`;
                 await manage.delete_ProfileProxy(name);
                 break;
             case 'Back':
-                return await profile_Action(name);                
+                return await profile_Action(name);
         };
         return await proxy_Profile(name);
     });
@@ -331,11 +331,11 @@ let fp_Profile = async function(name){
             name: 'action',
             message: `Fingerprint: False\n${utils.timeLog()} Select an action:`,
             prefix: utils.timeLog(),
-            choices: [ 
-                new inquirer.Separator(), 
+            choices: [
+                new inquirer.Separator(),
                 'Set new fingerprint',
-                new inquirer.Separator(), 
-                'Back', 
+                new inquirer.Separator(),
+                'Back',
             ]}]).then(async (answers) => {
             if (answers.action == "Set new fingerprint"){
                 await manage.change_ProfileFP(name);
@@ -352,12 +352,12 @@ let fp_Profile = async function(name){
             name: 'action',
             message: `Fingerprint: True\n${utils.timeLog()} Select an action:`,
             prefix: utils.timeLog(),
-            choices: [ 
-                new inquirer.Separator(), 
+            choices: [
+                new inquirer.Separator(),
               'Change fingerprint',
               'Delete fingerprint',
-              new inquirer.Separator(), 
-              'Back', 
+              new inquirer.Separator(),
+              'Back',
             ]
         }]).then(async (answers) => {
             if (answers.action == "Change fingerprint"){
@@ -378,5 +378,3 @@ let fp_Profile = async function(name){
 
 
 module.exports.start = start;
-
-
