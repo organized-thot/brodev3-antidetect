@@ -1,13 +1,20 @@
 {
+  "name": "brodev3-antidetect",
+  "version": "1.1.0",
   "dependencies": {
+    "axios": "^1.13.5",
     "dotenv": "^16.3.1",
     "figlet": "^1.7.0",
-    "google-spreadsheet": "^4.1.1",
-    "googleapis": "^131.0.0",
     "inquirer": "^8.0.0",
     "limiter": "^2.1.0",
     "playwright": "^1.39.0",
     "playwright-with-fingerprints": "^1.4.5",
     "socks-proxy-agent": "^8.0.4"
+  },
+  "devDependencies": {
+    "jest": "^30.2.0"
+  },
+  "scripts": {
+    "test": "jest"
   }
 }
