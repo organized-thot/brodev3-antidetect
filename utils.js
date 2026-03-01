@@ -45,3 +45,13 @@ module.exports.menu = menu;
 module.exports.timeLog = timeLog;
 module.exports.storageType = storageType;
 module.exports.engine = engine;
+const path = require('path');
+
+function sanitizeName(name) {
+  if (typeof name !== 'string' || name.trim() === '') return '';
+  const sanitized = path.basename(path.normalize(name));
+  if (sanitized === '.' || sanitized === '..') return '';
+  return sanitized;
+}
+
+module.exports.sanitizeName = sanitizeName;

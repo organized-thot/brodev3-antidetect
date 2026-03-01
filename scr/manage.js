@@ -18,6 +18,11 @@ async function saveFP(dir){
 };
 
 let create_Profile = async function (name, options) {
+    name = utils.sanitizeName(name);
+    if (!name) {
+        console.error(utils.timeLog() + ` Error: Invalid profile name.`);
+        return;
+    }
     let dir;
     let storageType = await utils.storageType;
     switch(storageType){
@@ -47,6 +52,11 @@ let create_Profile = async function (name, options) {
 };
 
 let open_Profile = async function (name){
+    name = utils.sanitizeName(name);
+    if (!name) {
+        console.error(utils.timeLog() + ` Error: Invalid profile name.`);
+        return false;
+    }
     let check = await db.check_Profile(name);
     if (!check)
         return console.log(utils.timeLog() + ` Profile ${name} is not exist`);
@@ -94,6 +104,11 @@ let delete_ProfileProxy = async function (name){
 };
 
 let change_ProfileFP = async function (name){
+    name = utils.sanitizeName(name);
+    if (!name) {
+        console.error(utils.timeLog() + ` Error: Invalid profile name.`);
+        return;
+    }
     let profileData = {};
     let storageType = await utils.storageType;
     let dir;
@@ -111,6 +126,11 @@ let change_ProfileFP = async function (name){
 };
 
 let delete_ProfileFP = async function (name){
+    name = utils.sanitizeName(name);
+    if (!name) {
+        console.error(utils.timeLog() + ` Error: Invalid profile name.`);
+        return;
+    }
     let dir = config.cloudDir + `profiles/` + name;
     let profileData = {};
     profileData.fingerprint = '';
@@ -141,6 +161,12 @@ let delete_ProfileFP = async function (name){
 // };
 
 let rename_Profile = async function (name, newName){
+    name = utils.sanitizeName(name);
+    newName = utils.sanitizeName(newName);
+    if (!name || !newName) {
+        console.error(utils.timeLog() + ` Error: Invalid profile name.`);
+        return;
+    }
     let dir = config.cloudDir + `profiles/`;
     let profileData = {};
     profileData.name = newName;
@@ -155,6 +181,11 @@ let rename_Profile = async function (name, newName){
 };
 
 let delete_Profile = async function (name) {
+    name = utils.sanitizeName(name);
+    if (!name) {
+        console.error(utils.timeLog() + ` Error: Invalid profile name.`);
+        return;
+    }
     let dir = config.cloudDir + `profiles/` + name;
     await db.delete_Profile(name);
     try {
