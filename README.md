@@ -15,9 +15,9 @@
 
 A console application with a simple user interface for managing and working with browser profiles with anti-detection protection. 
 
-It is based on the [browser-with-fingerprints](https://github.com/CheshireCaat/browser-with-fingerprints) plugin, which allows you to change your browser fingerprint, create a virtual identity and increase the secrecy of your browser. 
+It uses Apify's `fingerprint-suite` (`fingerprint-generator` and `fingerprint-injector`) which allows you to change your browser fingerprint, create a virtual identity and increase the secrecy of your browser.
 
-This is done using the [FingerprintSwitcher](https://fingerprints.bablosoft.com/) service, which allows you to replace a list of important browser properties, so you will behave like a completely new user.
+This allows you to replace a list of important browser properties, so you will behave like a completely new user.
 
 The application will allow you to increase your anonymity on the web. You can use multi-accounts on any platforms as different users. Thanks to the simple console interface, you don't need any skills to use antidetect. This project is for the community and I will gradually develop and improve it in the future. 
 
@@ -66,7 +66,7 @@ The Dashboard can be customized to suit your needs, with additional columns adde
 
 ### Fingerprint
 
-The application allows you to change the digital fingerprint of each profile. When creating a new profile, a digital fingerprint is assigned to it, which you can later modify. Using the [FingerprintSwitcher](https://fingerprints.bablosoft.com/#home), we obtain the real fingerprint in JSON format and apply it to open the profile with that fingerprint.
+The application allows you to change the digital fingerprint of each profile. When creating a new profile, a digital fingerprint is assigned to it, which you can later modify. Using Apify's `fingerprint-generator`, we generate a real fingerprint in JSON format and apply it to open the profile with that fingerprint using `fingerprint-injector`.
 
 The service offers extensive capabilities for effective masking, the main ones of which are outlined below.
 <p align="center">
@@ -140,7 +140,6 @@ To configure the `.env` file, follow these steps:
 - **BASEROW_API_TOKEN**: Your Baserow Database Token.
 - **BASEROW_TABLE_ID**: The ID of the table you created.
 - **DIR**: The path to the `antidetect` directory (optional).
-- **FPKEY**: The fingerprinting key provided by [Bablosoft](https://fingerprints.bablosoft.com/).
 - **NODE_ENV**: The environment setting. Don't change
 
 > ⚠️ **Note**: Ensure that all sensitive keys and paths are accurately set to prevent configuration issues.

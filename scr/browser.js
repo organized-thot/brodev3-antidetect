@@ -1,7 +1,8 @@
 const config = require('../config');
 const utils = require('../utils');
 const db = require('./db');
-const { plugin } = require('playwright-with-fingerprints');
+const { chromium } = require('playwright');
+const { FingerprintInjector } = require('fingerprint-injector');
 const fs = require('fs');
 const manage = require('./manage');
 const fingerprint = require('./fingerprint');
@@ -20,7 +21,7 @@ let proxyChecker = async function (type, proxy, auth){
   let check;
   if (type == 'https'){
     try {
-      check = await axios.get('http://ip.bablosoft.com/', {
+      check = await axios.get('https://api.ipify.org', {
       proxy: {
         protocol: 'http',
         host: host,
@@ -38,11 +39,11 @@ let proxyChecker = async function (type, proxy, auth){
   if (type == 'socks5'){
     const proxyAgent  = new SocksProxyAgent(`socks5://${username}:${password}@${host}:${port}`);
     const axiosInstance = axios.create({
-      httpsAgent: proxyAgent, 
-      httpAgent: proxyAgent 
+      httpsAgent: proxyAgent,
+      httpAgent: proxyAgent
     });
     try {
-      check = await axiosInstance.get('http://ip.bablosoft.com/');
+      check = await axiosInstance.get('https://api.ipify.org');
     check = check.status;
     } catch (err){
       check = false;
@@ -50,17 +51,8 @@ let proxyChecker = async function (type, proxy, auth){
   };
   if (check)
     return true;
-  else 
+  else
     return false;
-};
-
-let engine = function() {
-  plugin.setRequestTimeout(120 * 60000);
-  let dir = path.resolve(__dirname, '..') + '/engines/' + utils.engine;
-  if (utils.engine != 'main')
-    plugin.setWorkingFolder(dir);
-  else  
-    plugin.setWorkingFolder('./data');
 };
 
 let launch = async function (name, profile){
@@ -85,25 +77,10 @@ let launch = async function (name, profile){
       fs.writeFileSync(dir +'/fp.json', JSON.stringify(data));
     };
 
-    engine();
-    let options = {
-      profile: {},
-      proxy: {
-        changeTimezone: true,
-        changeGeolocation: true,
-        changeBrowserLanguage: true,
-      }
+    let launchOptions = {
+      headless: false,
+      ignoreDefaultArgs: ["--enable-automation", `--allow-file-access-from-files`],
     };
-    
-    if (await profile.get('fingerprint') > false){
-      let fp = JSON.stringify(JSON.parse(fs.readFileSync(dir + '/fp.json')));
-      plugin.useFingerprint(fp, {    
-        // safeElementSize: true,
-        emulateSensorAPI: false,
-      });
-    }
-    else 
-      options.profile.loadFingerprint = false;
 
     let proxyType = await profile.get('proxyType');
     if (!proxyType == false){
@@ -116,29 +93,25 @@ let launch = async function (name, profile){
         console.log(utils.timeLog() + ' Bad proxy at ' + name);
         browser =  false;
         return false;
-      } 
-
-      plugin.useProxy(`${proxyType}://${login}:${proxy.join(":")}`, 
-        options.proxy);
+      }
+      let host = proxy.join(':');
+      launchOptions.proxy = {
+        server: `${proxyType}://${host}`,
+        username: login.split(':')[0],
+        password: login.split(':')[1],
+      };
     }
-    else 
-      options.profile.loadProxy = false;
 
-    plugin.useProfile(dir, options.profile);
-  
-    browser = await plugin.launchPersistentContext(dir, {
-      headless: false,
-      ignoreDefaultArgs: ["--enable-automation", `--allow-file-access-from-files`],
-      // args: [
-      //   `--disable-extensions-except=E:/farm/antidetect/extentions/phantom`,
-      //   `--load-extension=E:/farm/antidetect/extentions/phantom`
-      // ]
-      
-    });
+    browser = await chromium.launchPersistentContext(dir, launchOptions);
+
+    if (await profile.get('fingerprint') > false){
+      let fpData = JSON.parse(fs.readFileSync(dir + '/fp.json'));
+      const injector = new FingerprintInjector();
+      await injector.attachFingerprintToPlaywright(browser, fpData);
+    }
 
     browser.name = name;
     browser.on('close', async data => {
-      let name = data.name;
       console.log(utils.timeLog() + `Profile ${name} closed`);
       delete manage.active[name];
       switch(storageType){
@@ -149,11 +122,11 @@ let launch = async function (name, profile){
           setTimeout(db.close_Profile, 3000, name);
           break;
       };
-    });  
+    });
   });
   if (browser == false)
     return false;
-  
+
   let page = await browser.newPage();
   try{
     if (name.includes('Grass')){
@@ -165,10 +138,6 @@ let launch = async function (name, profile){
         await browser.close();
         page = false;
       }
-      // let page2 = await browser.newPage();
-      // await page2.goto('https://chromewebstore.google.com/detail/ilehaonighjijnmpnagapkhpcdbhclfg/');
-      // let page = await browser.newPage();
-      // await page.goto('https://www.google.com/search?q=' + name);
     }
     else
       await page.goto('https://abrahamjuliot.github.io/creepjs/');
@@ -186,13 +155,3 @@ let launch = async function (name, profile){
 };
 
 module.exports.launch = launch;
-
-
-
-
-
-
-  
-
-
-

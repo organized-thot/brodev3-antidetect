@@ -1,15 +1,17 @@
-const { plugin } = require('playwright-with-fingerprints');
-const config = require('../config');
+const { FingerprintGenerator } = require('fingerprint-generator');
 
 let get_Fingerprint = async function(){
-  const fingerprint = await plugin.fetch(config.fpkey, {
-    tags: ['Microsoft Windows', 'Chrome', 'Desktop'],
-    minWidth: 1440,
-    minHeight: 900,
-    maxWidth: 1920,
-    maxHeight:1080,
+  const fingerprintGenerator = new FingerprintGenerator({
+    browsers: ['chrome'],
+    devices: ['desktop'],
+    operatingSystems: ['windows'],
   });
-  return fingerprint;
+
+  const fingerprint = fingerprintGenerator.getFingerprint({
+    locales: ['en-US', 'en'],
+  });
+
+  return JSON.stringify(fingerprint);
 };
 
 module.exports = get_Fingerprint;
