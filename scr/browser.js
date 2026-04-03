@@ -95,17 +95,28 @@ let launch = async function (name, profile){
         return false;
       }
       let host = proxy.join(':');
+      let scheme = proxyType === 'https' ? 'http' : proxyType;
       launchOptions.proxy = {
-        server: `${proxyType}://${host}`,
+        server: `${scheme}://${host}`,
         username: login.split(':')[0],
         password: login.split(':')[1],
       };
     }
 
+    let isFingerprintEnabled = await profile.get('fingerprint') > false;
+    let fpData;
+    if (isFingerprintEnabled){
+      fpData = JSON.parse(fs.readFileSync(dir + '/fp.json'));
+      launchOptions.userAgent = fpData.fingerprint.navigator.userAgent;
+      launchOptions.viewport = {
+        width: fpData.fingerprint.screen.width,
+        height: fpData.fingerprint.screen.height
+      };
+    }
+
     browser = await chromium.launchPersistentContext(dir, launchOptions);
 
-    if (await profile.get('fingerprint') > false){
-      let fpData = JSON.parse(fs.readFileSync(dir + '/fp.json'));
+    if (isFingerprintEnabled){
       const injector = new FingerprintInjector();
       await injector.attachFingerprintToPlaywright(browser, fpData);
     }
